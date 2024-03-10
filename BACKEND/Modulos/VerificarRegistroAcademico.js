@@ -13,19 +13,14 @@ const pool = mysql.createPool({
     queueLimit: 0
 });
 
-router.post('/verificar', async (req, res) => {
-    const { registroAcademico, contra } = req.body;
+router.post('/verificar_registro', async (req, res) => {
+    const { registroAcademico, correo } = req.body;
 
     try {
-        const [rows] = await pool.query('SELECT * FROM usuarios WHERE registroAcademico = ?', [registroAcademico]);
+        const [rows] = await pool.query('SELECT * FROM usuarios WHERE registroAcademico = ? AND correo = ?', [registroAcademico, correo]);
         
         if (rows.length > 0) {
-            const usuario = rows[0];
-            if (usuario.contra === contra) {
-                res.json({ exists: true, message: 'Inicio de sesión exitoso', usuario });
-            } else {
-                res.json({ exists: false, message: 'Contraseña incorrecta' });
-            }
+            res.json({ exists: true, message: 'Usuario encontrado', usuario: rows[0] });
         } else {
             res.json({ exists: false, message: 'El usuario no está registrado' });
         }
